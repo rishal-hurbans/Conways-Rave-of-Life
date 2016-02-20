@@ -3,16 +3,20 @@ var canvas = document.getElementById('canvas').getContext('2d');
 canvas.strokeStyle = '#E1E1E1';
 canvas.fillStyle = '#00A2EF';
 var cells = [];
+var cellScale = 10;
 var updateSpeed = 50;
 var totalAlive = 1;
 var totalLastAlive = 1;
 var audio = new AudioContext();
+var isMouseDown = false;
 
 init();
 
 function init() {
 
-    can.addEventListener("mousedown", "doMouseDown", false);
+    can.addEventListener("mousedown", doMouseDown, false);
+    can.addEventListener("mouseup", doMouseUp, false);
+    can.addEventListener("mousemove", doMouseMove, false);
 
     for (var i=0; i<64; i++) {
         cells[i] = [];
@@ -112,9 +116,21 @@ function update() {
 }
 
 function doMouseDown(event) {
-    var canvasX = event.pageX;
-    var canvasY = event.pageY;
-    console.log(canvasX + ", " + canvasY);
+    isMouseDown = true;
+}
+
+function doMouseUp(event) {
+    isMouseDown = false;
+}
+
+function doMouseMove(event) {
+    if(isMouseDown) {
+        var x = event.pageX;
+        var y = event.pageY;
+        x = Math.round(x / cellScale);
+        y = Math.round(y / cellScale);
+        cells[x][y] = 1;
+    }
 }
 
 function draw() {
@@ -122,7 +138,7 @@ function draw() {
     cells.forEach(function(row, x) {
         row.forEach(function(cell, y) {
             canvas.beginPath();
-            canvas.rect(x * 10, y * 10, 10, 10);
+            canvas.rect(x * cellScale, y * cellScale, cellScale, cellScale);
             if (cell) {
                 canvas.fill();
             } else {
